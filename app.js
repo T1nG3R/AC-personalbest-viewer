@@ -4,7 +4,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const resultsContainer = document.getElementById("results-container");
   const tableBody = document.getElementById("table-body");
   const searchInput = document.getElementById("search-input");
-  const clearBtn = document.getElementById("clear-btn");
+  const clearSearchBtn = document.getElementById("clear-search-btn");
+  const closeFileBtn = document.getElementById("close-file-btn");
   const tableHeaders = document.querySelectorAll("th[data-sort]");
   const selectBtn = document.getElementById("select-btn");
   const copyPath = document.getElementById("copy-path");
@@ -207,9 +208,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
   searchInput.addEventListener("input", (e) => {
     refreshDisplay();
+    if (searchInput.value.length > 0) {
+      clearSearchBtn.classList.remove("hidden");
+    } else {
+      clearSearchBtn.classList.add("hidden");
+    }
   });
 
-  clearBtn.addEventListener("click", () => {
+  clearSearchBtn.addEventListener("click", () => {
+    searchInput.value = "";
+    refreshDisplay();
+    clearSearchBtn.classList.add("hidden");
+    searchInput.focus();
+  });
+
+  closeFileBtn.addEventListener("click", () => {
     allData = [];
     currentSort = { column: null, direction: "asc" };
     refreshDisplay();
@@ -219,6 +232,7 @@ document.addEventListener("DOMContentLoaded", () => {
     instructions.classList.remove("hidden");
     fileInput.value = "";
     searchInput.value = "";
+    clearSearchBtn.classList.add("hidden");
   });
 
   // --- Sorting & Display Refresh ---
