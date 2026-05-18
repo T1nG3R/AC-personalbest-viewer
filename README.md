@@ -1,5 +1,7 @@
 # Assetto Corsa Personal Best Viewer
 
+**Live Website:** [https://t1ng3r.github.io/AC-personalbest-viewer/](https://t1ng3r.github.io/AC-personalbest-viewer/)
+
 A simple, static web tool to parse and view your Assetto Corsa `personalbest.ini` file.
 
 ## Features
@@ -11,7 +13,7 @@ A simple, static web tool to parse and view your Assetto Corsa `personalbest.ini
 - **Privacy First**: All processing happens in your browser. No data is ever uploaded to a server.
 
 ## How to Use
-1. Locate your `personalbest.ini` file (usually in `Documents\Assetto Corsa`).
-2. Open this website.
+1. Locate your `personalbest.ini` file (usually in `Documents\Assetto Corsa\settings`).
+2. Open the [Live Website](https://t1ng3r.github.io/AC-personalbest-viewer/).
 3. Drag and drop the file into the upload area or click "Select File".
 4. Browse your records!
