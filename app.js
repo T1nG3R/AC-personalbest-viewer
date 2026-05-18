@@ -6,16 +6,63 @@ document.addEventListener("DOMContentLoaded", () => {
   const searchInput = document.getElementById("search-input");
   const clearBtn = document.getElementById("clear-btn");
   const tableHeaders = document.querySelectorAll("th[data-sort]");
+  const selectBtn = document.getElementById("select-btn");
+  const copyPath = document.getElementById("copy-path");
 
   let allData = [];
   let currentSort = { column: null, direction: "asc" };
 
   // --- File Handling ---
 
-  dropZone.addEventListener("click", (e) => {
-    // Only trigger click if the user didn't click the file input or the label directly
-    if (e.target !== fileInput && !e.target.closest("label")) {
+  async function openFilePicker() {
+    if (window.showOpenFilePicker) {
+      try {
+        const [fileHandle] = await window.showOpenFilePicker({
+          startIn: 'documents',
+          types: [{
+            description: 'INI Files',
+            accept: { 'text/plain': ['.ini'] }
+          }],
+          multiple: false
+        });
+        const file = await fileHandle.getFile();
+        handleFile(file);
+      } catch (error) {
+        if (error.name !== 'AbortError') {
+          console.error('File System Access API error:', error);
+          fileInput.click();
+        }
+      }
+    } else {
       fileInput.click();
+    }
+  }
+
+  selectBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    openFilePicker();
+  });
+
+  copyPath.addEventListener("click", (e) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText("Documents\\Assetto Corsa").then(() => {
+      const originalText = copyPath.innerText;
+      copyPath.innerText = "Copied!";
+      copyPath.style.color = "#4CAF50";
+      setTimeout(() => {
+        copyPath.innerText = originalText;
+        copyPath.style.color = "var(--accent-color)";
+      }, 1500);
+    });
+  });
+
+  dropZone.addEventListener("click", (e) => {
+    if (window.getSelection().toString().length > 0) {
+      return;
+    }
+
+    if (e.target !== fileInput && e.target !== selectBtn) {
+      openFilePicker();
     }
   });
 

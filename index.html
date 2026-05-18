@@ -14,14 +14,15 @@
                     Upload your <code>personalbest.ini</code> to view your
                     records.
                 </p>
+                <p class="hint-text" style="font-size: 0.9em; color: #aaa; margin-top: 15px; cursor: default;">Hint: Press <strong>Win + R</strong>, paste <code id="copy-path" style="background: #333; padding: 2px 6px; border-radius: 4px; cursor: pointer; color: var(--accent-color); transition: background 0.2s;" title="Click to copy path">Documents\Assetto Corsa 📋</code> and hit Enter to find your file.</p>
             </header>
 
             <main>
                 <div id="drop-zone" class="drop-zone">
                     <p>Drag and drop <code>personalbest.ini</code> here</p>
                     <span>or</span>
+                    <button id="select-btn" class="btn">Select File</button>
                     <input type="file" id="file-input" accept=".ini" />
-                    <label for="file-input" class="btn">Select File</label>
                 </div>
 
                 <div id="results-container" class="hidden">
