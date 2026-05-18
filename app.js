@@ -95,7 +95,7 @@ document.addEventListener("DOMContentLoaded", () => {
     reader.onload = (e) => {
       const content = e.target.result;
       allData = parseINI(content);
-      renderTable(allData);
+      refreshDisplay();
       resultsContainer.classList.remove("hidden");
       dropZone.classList.add("hidden");
       instructions.classList.add("hidden");
@@ -174,18 +174,13 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   searchInput.addEventListener("input", (e) => {
-    const term = e.target.value.toLowerCase();
-    const filtered = allData.filter(
-      (item) =>
-        item.car.toLowerCase().includes(term) ||
-        item.track.toLowerCase().includes(term),
-    );
-    renderTable(filtered);
+    refreshDisplay();
   });
 
   clearBtn.addEventListener("click", () => {
     allData = [];
-    renderTable([]);
+    currentSort = { column: null, direction: "asc" };
+    refreshDisplay();
     resultsContainer.classList.add("hidden");
     dropZone.classList.remove("hidden");
     instructions.classList.remove("hidden");
@@ -193,7 +188,44 @@ document.addEventListener("DOMContentLoaded", () => {
     searchInput.value = "";
   });
 
-  // --- Sorting ---
+  // --- Sorting & Display Refresh ---
+
+  function refreshDisplay() {
+    const term = searchInput.value.toLowerCase();
+    let displayData = allData.filter(
+      (item) =>
+        item.car.toLowerCase().includes(term) ||
+        item.track.toLowerCase().includes(term),
+    );
+
+    if (currentSort.column) {
+      displayData.sort((a, b) => {
+        let valA = a[currentSort.column];
+        let valB = b[currentSort.column];
+        const direction = currentSort.direction;
+
+        if (typeof valA === "string") {
+          return direction === "asc"
+            ? valA.localeCompare(valB)
+            : valB.localeCompare(valA);
+        } else {
+          return direction === "asc" ? valA - valB : valB - valA;
+        }
+      });
+    }
+
+    renderTable(displayData);
+    updateSortUI();
+  }
+
+  function updateSortUI() {
+    tableHeaders.forEach((header) => {
+      header.classList.remove("sort-asc", "sort-desc");
+      if (header.getAttribute("data-sort") === currentSort.column) {
+        header.classList.add(`sort-${currentSort.direction}`);
+      }
+    });
+  }
 
   tableHeaders.forEach((header) => {
     header.addEventListener("click", () => {
@@ -204,21 +236,7 @@ document.addEventListener("DOMContentLoaded", () => {
           : "asc";
 
       currentSort = { column, direction };
-
-      const sorted = [...allData].sort((a, b) => {
-        let valA = a[column];
-        let valB = b[column];
-
-        if (typeof valA === "string") {
-          return direction === "asc"
-            ? valA.localeCompare(valB)
-            : valB.localeCompare(valA);
-        } else {
-          return direction === "asc" ? valA - valB : valB - valA;
-        }
-      });
-
-      renderTable(sorted);
+      refreshDisplay();
     });
   });
 });

@@ -143,10 +143,30 @@ th {
     letter-spacing: 1px;
     cursor: pointer;
     user-select: none;
+    position: relative;
+    transition: background-color 0.2s;
 }
 
 th:hover {
     background-color: #2a2a2a;
+}
+
+th::after {
+    content: " ▼";
+    opacity: 0;
+    transition: opacity 0.2s;
+    font-size: 0.7rem;
+    vertical-align: middle;
+}
+
+th.sort-asc::after {
+    content: " ▲";
+    opacity: 1;
+}
+
+th.sort-desc::after {
+    content: " ▼";
+    opacity: 1;
 }
 
 tbody tr:nth-child(even) {
