@@ -84,7 +84,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function formatDate(ms) {
     if (!ms) return "N/A";
-    return new Date(ms).toLocaleString();
+    return new Date(ms).toLocaleString(undefined, {
+      weekday: "short",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   }
 
   function formatLapTime(ms) {
