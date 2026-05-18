@@ -171,6 +171,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // --- UI Rendering & Search ---
 
+  function updateStats(data) {
+    const statTotal = document.getElementById("stat-total");
+    const statRecent = document.getElementById("stat-recent");
+
+    if (!data || data.length === 0) {
+      statTotal.innerText = "0";
+      statRecent.innerText = "N/A";
+      return;
+    }
+
+    statTotal.innerText = data.length;
+
+    const mostRecent = data.reduce((prev, current) => {
+      return prev.date > current.date ? prev : current;
+    });
+
+    statRecent.innerText = `${mostRecent.car} @ ${mostRecent.track}`;
+    statRecent.title = `Achieved on: ${formatDate(mostRecent.date)}`;
+  }
+
   function renderTable(data) {
     tableBody.innerHTML = "";
     data.forEach((item) => {
@@ -229,6 +249,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     renderTable(displayData);
     updateSortUI();
+    updateStats(displayData);
   }
 
   function updateSortUI() {
