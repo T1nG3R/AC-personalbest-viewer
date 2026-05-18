@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const selectBtn = document.getElementById("select-btn");
   const copyPath = document.getElementById("copy-path");
   const instructions = document.getElementById("instructions");
+  const errorMessage = document.getElementById("error-message");
 
   let allData = [];
   let currentSort = { column: null, direction: "asc" };
@@ -16,6 +17,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- File Handling ---
 
   async function openFilePicker() {
+    errorMessage.classList.add("hidden");
     if (window.showOpenFilePicker) {
       try {
         const [fileHandle] = await window.showOpenFilePicker({
@@ -81,11 +83,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   dropZone.addEventListener("drop", (e) => {
     e.preventDefault();
+    errorMessage.classList.add("hidden");
     const file = e.dataTransfer.files[0];
     if (file) handleFile(file);
   });
 
   fileInput.addEventListener("change", (e) => {
+    errorMessage.classList.add("hidden");
     const file = e.target.files[0];
     if (file) handleFile(file);
   });
@@ -94,7 +98,15 @@ document.addEventListener("DOMContentLoaded", () => {
     const reader = new FileReader();
     reader.onload = (e) => {
       const content = e.target.result;
-      allData = parseINI(content);
+      const data = parseINI(content);
+
+      if (data.length === 0) {
+        errorMessage.classList.remove("hidden");
+        return;
+      }
+
+      errorMessage.classList.add("hidden");
+      allData = data;
       refreshDisplay();
       resultsContainer.classList.remove("hidden");
       dropZone.classList.add("hidden");
@@ -182,6 +194,7 @@ document.addEventListener("DOMContentLoaded", () => {
     currentSort = { column: null, direction: "asc" };
     refreshDisplay();
     resultsContainer.classList.add("hidden");
+    errorMessage.classList.add("hidden");
     dropZone.classList.remove("hidden");
     instructions.classList.remove("hidden");
     fileInput.value = "";

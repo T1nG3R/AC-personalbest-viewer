@@ -101,6 +101,16 @@ header h1 {
     display: none;
 }
 
+.error-box {
+    background-color: rgba(231, 76, 60, 0.1);
+    border: 1px solid var(--accent-color);
+    color: var(--accent-color);
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
 .controls {
     display: flex;
     gap: 15px;
@@ -143,7 +153,9 @@ th {
     letter-spacing: 1px;
     cursor: pointer;
     user-select: none;
-    position: relative;
+    position: sticky;
+    top: -1px; /* Slight offset to ensure it covers the top border properly */
+    z-index: 10;
     transition: background-color 0.2s;
 }
 
