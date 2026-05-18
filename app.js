@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const tableHeaders = document.querySelectorAll("th[data-sort]");
   const selectBtn = document.getElementById("select-btn");
   const copyPath = document.getElementById("copy-path");
+  const instructions = document.getElementById("instructions");
 
   let allData = [];
   let currentSort = { column: null, direction: "asc" };
@@ -18,6 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (window.showOpenFilePicker) {
       try {
         const [fileHandle] = await window.showOpenFilePicker({
+          id: 'assetto-corsa-pb',
           startIn: 'documents',
           types: [{
             description: 'INI Files',
@@ -96,6 +98,7 @@ document.addEventListener("DOMContentLoaded", () => {
       renderTable(allData);
       resultsContainer.classList.remove("hidden");
       dropZone.classList.add("hidden");
+      instructions.classList.add("hidden");
     };
     reader.readAsText(file);
   }
@@ -185,6 +188,7 @@ document.addEventListener("DOMContentLoaded", () => {
     renderTable([]);
     resultsContainer.classList.add("hidden");
     dropZone.classList.remove("hidden");
+    instructions.classList.remove("hidden");
     fileInput.value = "";
     searchInput.value = "";
   });
