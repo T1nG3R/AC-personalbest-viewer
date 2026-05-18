@@ -12,7 +12,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // --- File Handling ---
 
-  dropZone.addEventListener("click", () => fileInput.click());
+  dropZone.addEventListener("click", (e) => {
+    // Only trigger click if the user didn't click the file input or the label directly
+    if (e.target !== fileInput && !e.target.closest("label")) {
+      fileInput.click();
+    }
+  });
 
   dropZone.addEventListener("dragover", (e) => {
     e.preventDefault();
@@ -87,7 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
     return new Date(ms).toLocaleString(undefined, {
       weekday: "short",
       year: "numeric",
-      month: "long",
+      month: "2-digit",
       day: "numeric",
       hour: "2-digit",
       minute: "2-digit",
