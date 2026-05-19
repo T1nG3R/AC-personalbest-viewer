@@ -7,6 +7,8 @@
     --border-color: #333;
     --table-header: #252525;
     --row-alt: #1a1a1a;
+    --fast-color: #2ecc71;
+    --slow-color: #ff6b6b;
 }
 
 * {
@@ -193,12 +195,12 @@ input:checked + .switch:before {
 }
 
 .text-fast {
-    color: #2ecc71;
+    color: var(--fast-color);
     font-weight: bold;
 }
 
 .text-slow {
-    color: #e74c3c;
+    color: var(--slow-color);
 }
 
 .hidden {
