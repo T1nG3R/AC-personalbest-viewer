@@ -1,0 +1,9 @@
+.gitignore
+personalbest.ini
+GEMINI.md
+TODO.md
+
+# Documentation and Tests
+docs/
+*.test.js
+search.test.js

@@ -7,7 +7,11 @@ A simple, static web tool to parse and view your Assetto Corsa `personalbest.ini
 ## Features
 - **Human-Readable Dates**: Converts Unix timestamps to your local date and time.
 - **Formatted Lap Times**: Converts milliseconds to `m:ss.ms` format.
-- **Search & Filter**: Quickly find specific cars or tracks.
+- **Advanced Search & Filter**: Powerful search engine with support for:
+    - **Multi-term**: Combine keywords to narrow down results (logical AND).
+    - **Exact Phrases**: Use `"quotes"` for precise matches.
+    - **Prefixes**: Filter by specific columns using `car:m3` or `track:spa`.
+    - **Fuzzy Matching**: Smart matching that finds sequences of characters even if they aren't adjacent.
 - **Sortable Table**: Sort by car, track, date, or your best lap time.
 - **Dark Theme**: Assetto Corsa inspired dark UI.
 - **Privacy First**: All processing happens in your browser. No data is ever uploaded to a server.

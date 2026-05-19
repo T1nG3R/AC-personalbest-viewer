@@ -150,13 +150,31 @@ header h1 {
     display: flex;
     gap: 15px;
     margin-bottom: 20px;
+    align-items: flex-start;
+}
+
+.search-container {
+    flex-grow: 1;
 }
 
 .search-wrapper {
     position: relative;
-    flex-grow: 1;
     display: flex;
     align-items: center;
+}
+
+.search-hint {
+    font-size: 0.75rem;
+    color: #888;
+    margin-top: 5px;
+    margin-left: 2px;
+}
+
+.search-hint code {
+    background-color: #222;
+    padding: 1px 4px;
+    border-radius: 3px;
+    color: #ccc;
 }
 
 #search-input {
