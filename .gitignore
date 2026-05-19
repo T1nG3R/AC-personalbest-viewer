@@ -1,5 +1,5 @@
 .gitignore
-personalbest.ini
+*.ini
 GEMINI.md
 TODO.md
 

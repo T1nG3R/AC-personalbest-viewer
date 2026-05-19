@@ -84,6 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const addCompareBtn = document.getElementById("add-compare-btn");
   const compareInput = document.getElementById("compare-input");
   const matchOnlyToggle = document.getElementById("match-only-toggle");
+  const diffOnlyToggle = document.getElementById("diff-only-toggle");
   const comparisonFilters = document.getElementById("comparison-filters");
   const comparisonLegend = document.getElementById("comparison-legend");
 
@@ -92,6 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let primaryFileName = "";
   let compareFileName = "";
   let showMatchesOnly = false;
+  let showDifferencesOnly = false;
   let currentSort = { column: null, direction: "asc" };
 
   function mergeData(primary, compare) {
@@ -414,13 +416,29 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  diffOnlyToggle.addEventListener("change", (e) => {
+    showDifferencesOnly = e.target.checked;
+    refreshDisplay();
+  });
+
+  diffOnlyToggle.parentElement.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      diffOnlyToggle.checked = !diffOnlyToggle.checked;
+      showDifferencesOnly = diffOnlyToggle.checked;
+      refreshDisplay();
+    }
+  });
+
   closeFileBtn.addEventListener("click", () => {
     primaryData = [];
     compareData = [];
     primaryFileName = "";
     compareFileName = "";
     showMatchesOnly = false;
+    showDifferencesOnly = false;
     matchOnlyToggle.checked = false;
+    diffOnlyToggle.checked = false;
     currentSort = { column: null, direction: "asc" };
     
     refreshDisplay();
@@ -453,6 +471,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (showMatchesOnly) {
       merged = merged.filter(item => item.time !== null && item.compTime !== null);
+    }
+
+    if (showDifferencesOnly) {
+      merged = merged.filter(item => item.time !== item.compTime);
     }
 
     const parsedQuery = parseSearchQuery(searchInput.value);
