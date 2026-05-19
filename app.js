@@ -1,3 +1,73 @@
+function fuzzyMatch(pattern, string) {
+    if (!pattern) return true;
+    let patternIdx = 0;
+    let stringIdx = 0;
+    while (patternIdx < pattern.length && stringIdx < string.length) {
+        if (pattern[patternIdx].toLowerCase() === string[stringIdx].toLowerCase()) {
+            patternIdx++;
+        }
+        stringIdx++;
+    }
+    return patternIdx === pattern.length;
+}
+
+function parseSearchQuery(query) {
+    const exact = [];
+    const tokens = [];
+    
+    const quoteRegex = /"([^"]+)"/g;
+    let match;
+    while ((match = quoteRegex.exec(query)) !== null) {
+        exact.push(match[1].toLowerCase());
+    }
+    
+    const remaining = query.replace(quoteRegex, '').trim();
+    if (remaining) {
+        const parts = remaining.split(/\s+/);
+        parts.forEach(part => {
+            const lowerPart = part.toLowerCase();
+            if (lowerPart.startsWith('car:')) {
+                const term = lowerPart.substring(4);
+                if (term) tokens.push({ prefix: 'car', term });
+            } else if (lowerPart.startsWith('track:')) {
+                const term = lowerPart.substring(6);
+                if (term) tokens.push({ prefix: 'track', term });
+            } else {
+                tokens.push({ prefix: null, term: lowerPart });
+            }
+        });
+    }
+    
+    return { exact, tokens };
+}
+
+function rowMatchesQuery(row, parsedQuery) {
+    const carLower = row.car.toLowerCase();
+    const trackLower = row.track.toLowerCase();
+
+    // Check exact matches
+    for (const phrase of parsedQuery.exact) {
+        if (!carLower.includes(phrase) && !trackLower.includes(phrase)) {
+            return false;
+        }
+    }
+
+    // Check fuzzy/prefix tokens
+    for (const token of parsedQuery.tokens) {
+        if (token.prefix === 'car') {
+            if (!fuzzyMatch(token.term, row.car)) return false;
+        } else if (token.prefix === 'track') {
+            if (!fuzzyMatch(token.term, row.track)) return false;
+        } else {
+            if (!fuzzyMatch(token.term, row.car) && !fuzzyMatch(token.term, row.track)) {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   const fileInput = document.getElementById("file-input");
   const dropZone = document.getElementById("drop-zone");
@@ -238,12 +308,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- Sorting & Display Refresh ---
 
   function refreshDisplay() {
-    const term = searchInput.value.toLowerCase();
-    let displayData = allData.filter(
-      (item) =>
-        item.car.toLowerCase().includes(term) ||
-        item.track.toLowerCase().includes(term),
-    );
+    const parsedQuery = parseSearchQuery(searchInput.value);
+    let displayData = allData.filter((item) => rowMatchesQuery(item, parsedQuery));
 
     if (currentSort.column) {
       displayData.sort((a, b) => {
