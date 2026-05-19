@@ -350,8 +350,8 @@ document.addEventListener("DOMContentLoaded", () => {
       const slower = matches.filter(item => item.delta > 0).length;
       
       if (matches.length > 0) {
-        const summary = `${faster} faster, ${slower} slower`;
-        statTotal.innerText = `${data.length} (${summary})`;
+        const summary = `<span class="text-fast">${faster} faster</span>, <span class="text-slow">${slower} slower</span>`;
+        statTotal.innerHTML = `${data.length} (${summary})`;
       }
     }
   }
