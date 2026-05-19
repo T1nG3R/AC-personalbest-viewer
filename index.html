@@ -63,10 +63,23 @@
                             <div class="search-hint">
                                 Tip: Use <code>car:</code>/<code>track:</code> prefixes or <code>"quotes"</code> for exact phrases.
                             </div>
+                            <div id="comparison-legend" class="comparison-legend hidden"></div>
                         </div>
-                        <button id="close-file-btn" class="btn btn-secondary">
-                            Close File
-                        </button>
+                        <div class="button-group">
+                            <button id="add-compare-btn" class="btn btn-secondary">
+                                Add Comparison
+                            </button>
+                            <input type="file" id="compare-input" accept=".ini" class="hidden" />
+                            <button id="close-file-btn" class="btn btn-secondary">
+                                Close File
+                            </button>
+                        </div>
+                    </div>
+                    <div id="comparison-filters" class="filters hidden">
+                        <label class="filter-toggle" tabindex="0">
+                            <input type="checkbox" id="match-only-toggle" />
+                            <span>Show Matches Only</span>
+                        </label>
                     </div>
                     <div class="table-wrapper">
                         <table id="results-table">
@@ -76,6 +89,7 @@
                                     <th data-sort="track" tabindex="0" role="button" aria-sort="none">Track</th>
                                     <th data-sort="date" tabindex="0" role="button" aria-sort="none">Date</th>
                                     <th data-sort="time" tabindex="0" role="button" aria-sort="none">Best Time</th>
+                                    <th data-sort="delta" tabindex="0" role="button" aria-sort="none">Delta</th>
                                 </tr>
                             </thead>
                             <tbody id="table-body">

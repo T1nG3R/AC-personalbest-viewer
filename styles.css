@@ -102,6 +102,54 @@ header h1 {
     background-color: #555;
 }
 
+.button-group {
+    display: flex;
+    gap: 10px;
+}
+
+.comparison-legend {
+    font-size: 0.8rem;
+    color: #888;
+    margin-top: 5px;
+    font-style: italic;
+}
+
+.filters {
+    margin-bottom: 20px;
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.filter-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    user-select: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    transition: background-color 0.2s;
+}
+
+.filter-toggle:hover {
+    background-color: #252525;
+}
+
+.filter-toggle input {
+    cursor: pointer;
+}
+
+.text-fast {
+    color: #2ecc71;
+    font-weight: bold;
+}
+
+.text-slow {
+    color: #e74c3c;
+}
+
 .hidden {
     display: none;
 }

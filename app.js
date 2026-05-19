@@ -81,9 +81,53 @@ document.addEventListener("DOMContentLoaded", () => {
   const copyPath = document.getElementById("copy-path");
   const instructions = document.getElementById("instructions");
   const errorMessage = document.getElementById("error-message");
+  const addCompareBtn = document.getElementById("add-compare-btn");
+  const compareInput = document.getElementById("compare-input");
+  const matchOnlyToggle = document.getElementById("match-only-toggle");
+  const comparisonFilters = document.getElementById("comparison-filters");
+  const comparisonLegend = document.getElementById("comparison-legend");
 
-  let allData = [];
+  let primaryData = [];
+  let compareData = [];
+  let primaryFileName = "";
+  let compareFileName = "";
+  let showMatchesOnly = false;
   let currentSort = { column: null, direction: "asc" };
+
+  function mergeData(primary, compare) {
+    if (!compare || compare.length === 0) {
+      return primary.map(item => ({ ...item, compTime: null, delta: null }));
+    }
+
+    const compareMap = new Map();
+    compare.forEach(item => {
+      compareMap.set(`${item.car}@${item.track}`, item);
+    });
+
+    const merged = primary.map(item => {
+      const match = compareMap.get(`${item.car}@${item.track}`);
+      return {
+        ...item,
+        compTime: match ? match.time : null,
+        delta: match ? item.time - match.time : null
+      };
+    });
+
+    // Add items that exist ONLY in compare
+    const primarySet = new Set(primary.map(item => `${item.car}@${item.track}`));
+    compare.forEach(item => {
+      if (!primarySet.has(`${item.car}@${item.track}`)) {
+        merged.push({
+          ...item,
+          time: null, // No primary time
+          compTime: item.time,
+          delta: null
+        });
+      }
+    });
+
+    return merged;
+  }
 
   // --- File Handling ---
 
@@ -170,17 +214,22 @@ document.addEventListener("DOMContentLoaded", () => {
   dropZone.addEventListener("drop", (e) => {
     e.preventDefault();
     errorMessage.classList.add("hidden");
-    const file = e.dataTransfer.files[0];
-    if (file) handleFile(file);
+    const files = Array.from(e.dataTransfer.files).filter(f => f.name.endsWith('.ini'));
+    if (files.length >= 2) {
+      handleFile(files[0], 'primary');
+      handleFile(files[1], 'compare');
+    } else if (files.length === 1) {
+      handleFile(files[0], 'primary');
+    }
   });
 
   fileInput.addEventListener("change", (e) => {
     errorMessage.classList.add("hidden");
     const file = e.target.files[0];
-    if (file) handleFile(file);
+    if (file) handleFile(file, 'primary');
   });
 
-  function handleFile(file) {
+  function handleFile(file, role = 'primary') {
     const reader = new FileReader();
     reader.onload = (e) => {
       const content = e.target.result;
@@ -192,14 +241,23 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       errorMessage.classList.add("hidden");
-      allData = data;
+      if (role === 'primary') {
+        primaryData = data;
+        primaryFileName = file.name;
+      } else {
+        compareData = data;
+        compareFileName = file.name;
+      }
+      
       refreshDisplay();
       resultsContainer.classList.remove("hidden");
       dropZone.classList.add("hidden");
       instructions.classList.add("hidden");
       
       // Move focus to search input for immediate interaction
-      setTimeout(() => searchInput.focus(), 100);
+      if (role === 'primary') {
+        setTimeout(() => searchInput.focus(), 100);
+      }
     };
     reader.readAsText(file);
   }
@@ -272,23 +330,45 @@ document.addEventListener("DOMContentLoaded", () => {
 
     statTotal.innerText = data.length;
 
-    const mostRecent = data.reduce((prev, current) => {
-      return prev.date > current.date ? prev : current;
-    });
+    // Filter out rows that only exist in comparison file (time === null) for "Most Recent"
+    const primaryOnly = data.filter(item => item.time !== null);
+    
+    if (primaryOnly.length > 0) {
+      const mostRecent = primaryOnly.reduce((prev, current) => {
+        return prev.date > current.date ? prev : current;
+      });
+      statRecent.innerText = `${mostRecent.car} @ ${mostRecent.track}`;
+      statRecent.title = `Achieved on: ${formatDate(mostRecent.date)}`;
+    } else {
+      statRecent.innerText = "N/A";
+    }
 
-    statRecent.innerText = `${mostRecent.car} @ ${mostRecent.track}`;
-    statRecent.title = `Achieved on: ${formatDate(mostRecent.date)}`;
+    // Add Comparison summary if active
+    if (compareData.length > 0) {
+      const matches = data.filter(item => item.delta !== null);
+      const faster = matches.filter(item => item.delta < 0).length;
+      const slower = matches.filter(item => item.delta > 0).length;
+      
+      if (matches.length > 0) {
+        const summary = `${faster} faster, ${slower} slower`;
+        statTotal.innerText = `${data.length} (${summary})`;
+      }
+    }
   }
 
   function renderTable(data) {
     tableBody.innerHTML = "";
     data.forEach((item) => {
+      const deltaClass = item.delta === null ? "" : (item.delta < 0 ? "text-fast" : "text-slow");
+      const deltaText = item.delta === null ? "-" : (item.delta / 1000).toFixed(3) + "s";
+
       const row = document.createElement("tr");
       row.innerHTML = `
                 <td>${item.car}</td>
                 <td>${item.track}</td>
                 <td>${formatDate(item.date)}</td>
                 <td><strong>${formatLapTime(item.time)}</strong></td>
+                <td class="${deltaClass}">${deltaText}</td>
             `;
       tableBody.appendChild(row);
     });
@@ -310,15 +390,46 @@ document.addEventListener("DOMContentLoaded", () => {
     searchInput.focus();
   });
 
+  addCompareBtn.addEventListener("click", () => {
+    compareInput.click();
+  });
+
+  compareInput.addEventListener("change", (e) => {
+    errorMessage.classList.add("hidden");
+    const file = e.target.files[0];
+    if (file) handleFile(file, 'compare');
+  });
+
+  matchOnlyToggle.addEventListener("change", (e) => {
+    showMatchesOnly = e.target.checked;
+    refreshDisplay();
+  });
+
+  matchOnlyToggle.parentElement.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      matchOnlyToggle.checked = !matchOnlyToggle.checked;
+      showMatchesOnly = matchOnlyToggle.checked;
+      refreshDisplay();
+    }
+  });
+
   closeFileBtn.addEventListener("click", () => {
-    allData = [];
+    primaryData = [];
+    compareData = [];
+    primaryFileName = "";
+    compareFileName = "";
+    showMatchesOnly = false;
+    matchOnlyToggle.checked = false;
     currentSort = { column: null, direction: "asc" };
+    
     refreshDisplay();
     resultsContainer.classList.add("hidden");
     errorMessage.classList.add("hidden");
     dropZone.classList.remove("hidden");
     instructions.classList.remove("hidden");
     fileInput.value = "";
+    compareInput.value = "";
     searchInput.value = "";
     clearSearchBtn.classList.add("hidden");
     
@@ -329,14 +440,33 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- Sorting & Display Refresh ---
 
   function refreshDisplay() {
+    let merged = mergeData(primaryData, compareData);
+    
+    if (compareData.length > 0) {
+      comparisonFilters.classList.remove("hidden");
+      comparisonLegend.classList.remove("hidden");
+      comparisonLegend.innerText = `Comparing: ${primaryFileName} vs ${compareFileName}`;
+    } else {
+      comparisonFilters.classList.add("hidden");
+      comparisonLegend.classList.add("hidden");
+    }
+
+    if (showMatchesOnly) {
+      merged = merged.filter(item => item.time !== null && item.compTime !== null);
+    }
+
     const parsedQuery = parseSearchQuery(searchInput.value);
-    let displayData = allData.filter((item) => rowMatchesQuery(item, parsedQuery));
+    let displayData = merged.filter((item) => rowMatchesQuery(item, parsedQuery));
 
     if (currentSort.column) {
       displayData.sort((a, b) => {
         let valA = a[currentSort.column];
         let valB = b[currentSort.column];
         const direction = currentSort.direction;
+
+        // Handle nulls in sorting (move to bottom)
+        if (valA === null) return 1;
+        if (valB === null) return -1;
 
         if (typeof valA === "string") {
           return direction === "asc"
