@@ -15,7 +15,7 @@
                         Upload your <code>personalbest.ini</code> to view your
                         records.
                     </p>
-                    <p class="hint-text" style="font-size: 0.9em; color: #aaa; margin-top: 15px; cursor: default;">Hint: Press <strong>Win + R</strong>, paste <code id="copy-path" style="background: #333; padding: 2px 6px; border-radius: 4px; cursor: pointer; color: var(--accent-color); transition: background 0.2s;" title="Click to copy path">Documents\Assetto Corsa 📋</code> and hit Enter to find your file.</p>
+                    <p class="hint-text" style="font-size: 0.9em; color: #aaa; margin-top: 15px; cursor: default;">Hint: Press <strong>Win + R</strong>, paste <code id="copy-path" tabindex="0" role="button" aria-label="Click to copy path to clipboard" style="background: #333; padding: 2px 6px; border-radius: 4px; cursor: pointer; color: var(--accent-color); transition: background 0.2s;" title="Click to copy path">Documents\Assetto Corsa 📋</code> and hit Enter to find your file.</p>
                 </div>
             </header>
 
@@ -50,8 +50,9 @@
                                     id="search-input"
                                     placeholder='Search car or track (e.g. car:m3 "spa")...'
                                     title='Search tips: use "quotes" for exact phrases, car: or track: prefixes for specific columns, or multiple words for AND logic.'
+                                    aria-label="Search records"
                                 />
-                                <button id="clear-search-btn" class="clear-icon hidden">
+                                <button id="clear-search-btn" class="clear-icon hidden" aria-label="Clear search">
                                     &times;
                                 </button>
                             </div>
@@ -67,10 +68,10 @@
                         <table id="results-table">
                             <thead>
                                 <tr>
-                                    <th data-sort="car">Car</th>
-                                    <th data-sort="track">Track</th>
-                                    <th data-sort="date">Date</th>
-                                    <th data-sort="time">Best Time</th>
+                                    <th data-sort="car" tabindex="0" role="button" aria-sort="none">Car</th>
+                                    <th data-sort="track" tabindex="0" role="button" aria-sort="none">Track</th>
+                                    <th data-sort="date" tabindex="0" role="button" aria-sort="none">Date</th>
+                                    <th data-sort="time" tabindex="0" role="button" aria-sort="none">Best Time</th>
                                 </tr>
                             </thead>
                             <tbody id="table-body">

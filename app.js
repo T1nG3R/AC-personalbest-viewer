@@ -118,8 +118,23 @@ document.addEventListener("DOMContentLoaded", () => {
     openFilePicker();
   });
 
+  const triggerOnKeyboard = (e, callback) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      callback();
+    }
+  };
+
   copyPath.addEventListener("click", (e) => {
     e.stopPropagation();
+    copyPathToClipboard();
+  });
+
+  copyPath.addEventListener("keydown", (e) => {
+    triggerOnKeyboard(e, copyPathToClipboard);
+  });
+
+  function copyPathToClipboard() {
     navigator.clipboard.writeText("Documents\\Assetto Corsa").then(() => {
       const originalText = copyPath.innerText;
       copyPath.innerText = "Copied!";
@@ -129,7 +144,7 @@ document.addEventListener("DOMContentLoaded", () => {
         copyPath.style.color = "var(--accent-color)";
       }, 1500);
     });
-  });
+  }
 
   dropZone.addEventListener("click", (e) => {
     if (window.getSelection().toString().length > 0) {
@@ -182,6 +197,9 @@ document.addEventListener("DOMContentLoaded", () => {
       resultsContainer.classList.remove("hidden");
       dropZone.classList.add("hidden");
       instructions.classList.add("hidden");
+      
+      // Move focus to search input for immediate interaction
+      setTimeout(() => searchInput.focus(), 100);
     };
     reader.readAsText(file);
   }
@@ -303,6 +321,9 @@ document.addEventListener("DOMContentLoaded", () => {
     fileInput.value = "";
     searchInput.value = "";
     clearSearchBtn.classList.add("hidden");
+    
+    // Move focus back to select button
+    selectBtn.focus();
   });
 
   // --- Sorting & Display Refresh ---
@@ -335,14 +356,17 @@ document.addEventListener("DOMContentLoaded", () => {
   function updateSortUI() {
     tableHeaders.forEach((header) => {
       header.classList.remove("sort-asc", "sort-desc");
+      header.setAttribute("aria-sort", "none");
+
       if (header.getAttribute("data-sort") === currentSort.column) {
         header.classList.add(`sort-${currentSort.direction}`);
+        header.setAttribute("aria-sort", currentSort.direction === "asc" ? "ascending" : "descending");
       }
     });
   }
 
   tableHeaders.forEach((header) => {
-    header.addEventListener("click", () => {
+    const sortHandler = () => {
       const column = header.getAttribute("data-sort");
       const direction =
         currentSort.column === column && currentSort.direction === "asc"
@@ -351,6 +375,41 @@ document.addEventListener("DOMContentLoaded", () => {
 
       currentSort = { column, direction };
       refreshDisplay();
-    });
+    };
+
+    header.addEventListener("click", sortHandler);
+    header.addEventListener("keydown", (e) => triggerOnKeyboard(e, sortHandler));
+  });
+
+  // --- Focus Trapping ---
+
+  window.addEventListener("keydown", (e) => {
+    if (e.key !== "Tab") return;
+
+    const focusableSelector = 'button, input, [tabindex="0"]';
+    const allFocusable = Array.from(document.querySelectorAll(focusableSelector))
+      .filter(el => {
+        // Filter out elements that are hidden or inside hidden containers
+        return el.offsetWidth > 0 && el.offsetHeight > 0 && !el.disabled;
+      });
+
+    if (allFocusable.length === 0) return;
+
+    const firstElement = allFocusable[0];
+    const lastElement = allFocusable[allFocusable.length - 1];
+
+    if (e.shiftKey) {
+      // Shift + Tab: Loop from first to last
+      if (document.activeElement === firstElement) {
+        e.preventDefault();
+        lastElement.focus();
+      }
+    } else {
+      // Tab: Loop from last to first
+      if (document.activeElement === lastElement) {
+        e.preventDefault();
+        firstElement.focus();
+      }
+    }
   });
 });
