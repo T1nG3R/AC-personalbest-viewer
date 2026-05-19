@@ -1,0 +1,23 @@
+{
+  "name": "AC Personal Best Viewer",
+  "short_name": "AC PB Viewer",
+  "description": "View and search your Assetto Corsa personal best records offline.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#121212",
+  "theme_color": "#e74c3c",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}
