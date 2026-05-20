@@ -446,7 +446,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupToggle(matchOnlyToggle, (val) => showMatchesOnly = val);
   setupToggle(diffOnlyToggle, (val) => showDifferencesOnly = val);
 
-  closeCompareBtn.addEventListener("click", () => {
+  function resetCompareState() {
     compareData = [];
     compareFileName = "";
     showMatchesOnly = false;
@@ -457,19 +457,17 @@ document.addEventListener("DOMContentLoaded", () => {
     
     addCompareBtn.classList.remove("hidden");
     closeCompareBtn.classList.add("hidden");
-    
+  }
+
+  closeCompareBtn.addEventListener("click", () => {
+    resetCompareState();
     refreshDisplay();
   });
 
   closeFileBtn.addEventListener("click", () => {
     primaryData = [];
-    compareData = [];
     primaryFileName = "";
-    compareFileName = "";
-    showMatchesOnly = false;
-    showDifferencesOnly = false;
-    matchOnlyToggle.checked = false;
-    diffOnlyToggle.checked = false;
+    resetCompareState();
     currentSort = { column: null, direction: "asc" };
     
     refreshDisplay();
@@ -478,11 +476,8 @@ document.addEventListener("DOMContentLoaded", () => {
     dropZone.classList.remove("hidden");
     instructions.classList.remove("hidden");
     fileInput.value = "";
-    compareInput.value = "";
     searchInput.value = "";
     clearSearchBtn.classList.add("hidden");
-    addCompareBtn.classList.remove("hidden");
-    closeCompareBtn.classList.add("hidden");
     
     // Move focus back to select button
     selectBtn.focus();
