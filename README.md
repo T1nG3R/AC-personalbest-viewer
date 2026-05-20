@@ -12,6 +12,7 @@ A simple, static web tool to parse and view your Assetto Corsa `personalbest.ini
     - **Exact Phrases**: Use `"quotes"` for precise matches.
     - **Prefixes**: Filter by specific columns using `car:m3` or `track:spa`.
     - **Fuzzy Matching**: Smart matching that finds sequences of characters even if they aren't adjacent.
+- **Comparison Feature**: Drag in a second file to see side-by-side performance differences (deltas) with "Matches Only" and "Differences Only" filters.
 - **Sortable Table**: Sort by car, track, date, or your best lap time.
 - **Keyboard Navigation**: Fully accessible UI with focus trapping and keyboard-driven sorting/searching.
 - **Dark Theme**: Assetto Corsa inspired dark UI.
