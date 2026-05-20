@@ -361,17 +361,19 @@ document.addEventListener("DOMContentLoaded", () => {
   function renderTable(data) {
     tableBody.innerHTML = "";
     data.forEach((item) => {
-      const deltaClass = item.delta === null ? "" : (item.delta < 0 ? "text-fast" : "text-slow");
+      const deltaClass = (item.delta === null || item.delta === 0) ? "" : (item.delta < 0 ? "text-fast" : "text-slow");
       const deltaText = item.delta === null ? "-" : (item.delta / 1000).toFixed(3) + "s";
 
       const row = document.createElement("tr");
       row.innerHTML = `
-                <td>${item.car}</td>
-                <td>${item.track}</td>
+                <td></td>
+                <td></td>
                 <td>${formatDate(item.date)}</td>
                 <td><strong>${formatLapTime(item.time)}</strong></td>
                 <td class="${deltaClass}">${deltaText}</td>
             `;
+      row.cells[0].textContent = item.car;
+      row.cells[1].textContent = item.track;
       tableBody.appendChild(row);
     });
   }
@@ -402,33 +404,24 @@ document.addEventListener("DOMContentLoaded", () => {
     if (file) handleFile(file, 'compare');
   });
 
-  matchOnlyToggle.addEventListener("change", (e) => {
-    showMatchesOnly = e.target.checked;
-    refreshDisplay();
-  });
-
-  matchOnlyToggle.parentElement.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      matchOnlyToggle.checked = !matchOnlyToggle.checked;
-      showMatchesOnly = matchOnlyToggle.checked;
+  const setupToggle = (toggle, callback) => {
+    toggle.addEventListener("change", (e) => {
+      callback(e.target.checked);
       refreshDisplay();
-    }
-  });
+    });
 
-  diffOnlyToggle.addEventListener("change", (e) => {
-    showDifferencesOnly = e.target.checked;
-    refreshDisplay();
-  });
+    toggle.parentElement.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        toggle.checked = !toggle.checked;
+        callback(toggle.checked);
+        refreshDisplay();
+      }
+    });
+  };
 
-  diffOnlyToggle.parentElement.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      diffOnlyToggle.checked = !diffOnlyToggle.checked;
-      showDifferencesOnly = diffOnlyToggle.checked;
-      refreshDisplay();
-    }
-  });
+  setupToggle(matchOnlyToggle, (val) => showMatchesOnly = val);
+  setupToggle(diffOnlyToggle, (val) => showDifferencesOnly = val);
 
   closeFileBtn.addEventListener("click", () => {
     primaryData = [];
