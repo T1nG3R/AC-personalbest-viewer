@@ -76,6 +76,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const searchInput = document.getElementById("search-input");
   const clearSearchBtn = document.getElementById("clear-search-btn");
   const closeFileBtn = document.getElementById("close-file-btn");
+  const closeCompareBtn = document.getElementById("close-compare-btn");
   const tableHeaders = document.querySelectorAll("th[data-sort]");
   const selectBtn = document.getElementById("select-btn");
   const copyPath = document.getElementById("copy-path");
@@ -202,18 +203,22 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  dropZone.addEventListener("dragover", (e) => {
+  document.body.addEventListener("dragover", (e) => {
     e.preventDefault();
-    dropZone.classList.add("drag-over");
+    if (!dropZone.classList.contains("hidden")) {
+      dropZone.classList.add("drag-over");
+    }
   });
 
   ["dragleave", "drop"].forEach((eventName) => {
-    dropZone.addEventListener(eventName, () =>
-      dropZone.classList.remove("drag-over"),
-    );
+    document.body.addEventListener(eventName, () => {
+      if (!dropZone.classList.contains("hidden")) {
+        dropZone.classList.remove("drag-over");
+      }
+    });
   });
 
-  dropZone.addEventListener("drop", (e) => {
+  document.body.addEventListener("drop", (e) => {
     e.preventDefault();
     errorMessage.classList.add("hidden");
     const files = Array.from(e.dataTransfer.files).filter(f => f.name.endsWith('.ini'));
@@ -221,7 +226,12 @@ document.addEventListener("DOMContentLoaded", () => {
       handleFile(files[0], 'primary');
       handleFile(files[1], 'compare');
     } else if (files.length === 1) {
-      handleFile(files[0], 'primary');
+      // If primary data is already loaded, treat the dropped file as a comparison
+      if (primaryData.length > 0) {
+        handleFile(files[0], 'compare');
+      } else {
+        handleFile(files[0], 'primary');
+      }
     }
   });
 
@@ -249,6 +259,8 @@ document.addEventListener("DOMContentLoaded", () => {
       } else {
         compareData = data;
         compareFileName = file.name;
+        addCompareBtn.classList.add("hidden");
+        closeCompareBtn.classList.remove("hidden");
       }
       
       refreshDisplay();
@@ -360,9 +372,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function renderTable(data) {
     tableBody.innerHTML = "";
+    
+    const isComparing = compareData.length > 0;
+    const deltaHeader = document.querySelector('th[data-sort="delta"]');
+    
+    if (isComparing) {
+      deltaHeader.classList.remove("hidden");
+    } else {
+      deltaHeader.classList.add("hidden");
+    }
+
     data.forEach((item) => {
       const deltaClass = (item.delta === null || item.delta === 0) ? "" : (item.delta < 0 ? "text-fast" : "text-slow");
       const deltaText = item.delta === null ? "-" : (item.delta / 1000).toFixed(3) + "s";
+      const deltaCellHTML = isComparing ? `<td class="${deltaClass}">${deltaText}</td>` : "";
 
       const row = document.createElement("tr");
       row.innerHTML = `
@@ -370,7 +393,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 <td></td>
                 <td>${formatDate(item.date)}</td>
                 <td><strong>${formatLapTime(item.time)}</strong></td>
-                <td class="${deltaClass}">${deltaText}</td>
+                ${deltaCellHTML}
             `;
       row.cells[0].textContent = item.car;
       row.cells[1].textContent = item.track;
@@ -423,15 +446,28 @@ document.addEventListener("DOMContentLoaded", () => {
   setupToggle(matchOnlyToggle, (val) => showMatchesOnly = val);
   setupToggle(diffOnlyToggle, (val) => showDifferencesOnly = val);
 
-  closeFileBtn.addEventListener("click", () => {
-    primaryData = [];
+  function resetCompareState() {
     compareData = [];
-    primaryFileName = "";
     compareFileName = "";
     showMatchesOnly = false;
     showDifferencesOnly = false;
     matchOnlyToggle.checked = false;
     diffOnlyToggle.checked = false;
+    compareInput.value = "";
+    
+    addCompareBtn.classList.remove("hidden");
+    closeCompareBtn.classList.add("hidden");
+  }
+
+  closeCompareBtn.addEventListener("click", () => {
+    resetCompareState();
+    refreshDisplay();
+  });
+
+  closeFileBtn.addEventListener("click", () => {
+    primaryData = [];
+    primaryFileName = "";
+    resetCompareState();
     currentSort = { column: null, direction: "asc" };
     
     refreshDisplay();
@@ -440,7 +476,6 @@ document.addEventListener("DOMContentLoaded", () => {
     dropZone.classList.remove("hidden");
     instructions.classList.remove("hidden");
     fileInput.value = "";
-    compareInput.value = "";
     searchInput.value = "";
     clearSearchBtn.classList.add("hidden");
     

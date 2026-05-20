@@ -69,6 +69,9 @@
                             <button id="add-compare-btn" class="btn btn-secondary">
                                 Add Comparison
                             </button>
+                            <button id="close-compare-btn" class="btn btn-secondary hidden">
+                                Close Comparison
+                            </button>
                             <input type="file" id="compare-input" accept=".ini" class="hidden" />
                             <button id="close-file-btn" class="btn btn-secondary">
                                 Close File
@@ -77,12 +80,12 @@
                     </div>
                     <div id="comparison-filters" class="filters hidden">
                         <label class="filter-toggle" tabindex="0" title="Hide records that exist in only one of the files">
-                            <input type="checkbox" id="match-only-toggle" />
+                            <input type="checkbox" id="match-only-toggle" tabindex="-1" />
                             <span class="switch"></span>
                             <span>Show Matches Only</span>
                         </label>
                         <label class="filter-toggle" tabindex="0" title="Hide records where lap times are identical">
-                            <input type="checkbox" id="diff-only-toggle" />
+                            <input type="checkbox" id="diff-only-toggle" tabindex="-1" />
                             <span class="switch"></span>
                             <span>Show Differences Only</span>
                         </label>
